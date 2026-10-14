@@ -106,11 +106,11 @@ fun PokemonListScreen(
 @Composable
 fun PokemonDetailScreen(
     pokemonId: Int,
-    viewModel: PokemonDetailViewModel = viewModel(),
+    viewModel: PokemonDetailViewModel = viewModel {
+        PokemonDetailViewModel(pokemonId)
+    },
 ) {
-    val pokemon = viewModel.getPokemonById(pokemonId)
+    val pokemon by viewModel.pokemon.collectAsStateWithLifecycle()
 
-    pokemon?.let {
-        Text(it.info)
-    }
+    Text(pokemon.name)
 }
