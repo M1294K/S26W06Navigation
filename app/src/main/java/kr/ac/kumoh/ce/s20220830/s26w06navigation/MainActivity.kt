@@ -13,14 +13,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
+import kr.ac.kumoh.ce.s20220830.s26w06navigation.model.Pokemon
+import kr.ac.kumoh.ce.s20220830.s26w06navigation.viewmodel.PokemonListViewModel
+import kr.ac.kumoh.ce.s20220830.s26w06navigation.viewmodel.PokemonDetailViewModel
 import kr.ac.kumoh.ce.s20220830.s26w06navigation.ui.theme.S26W06NavigationTheme
-import java.util.Map.entry
 
 sealed interface PokemonRoute : NavKey {
     @Serializable
@@ -29,8 +32,6 @@ sealed interface PokemonRoute : NavKey {
     @Serializable
     data class PokemonDetail(val pokemonId: Int) : PokemonRoute
 }
-
-data class Pokemon(val id: Int, val name: String, val type: String, val info: String)
 
 val pokemons = listOf(
     Pokemon(1, "이상해씨", "풀/독", "태어날 때부터 등에 식물의 씨앗이 있어 조금씩 자란다."),
@@ -67,7 +68,6 @@ fun MainScreen() {
             entryProvider = entryProvider {
                 entry<PokemonRoute.PokemonList> {
                     PokemonListScreen(
-                        pokemonList = pokemons,
                         onNavigateToDetail = { id ->
                             backStack.add(PokemonRoute.PokemonDetail(pokemonId = id))
                         }
@@ -83,11 +83,14 @@ fun MainScreen() {
 
 @Composable
 fun PokemonListScreen(
-    pokemonList: List<Pokemon>,
+//    pokemonList: List<Pokemon>,
     onNavigateToDetail: (Int) -> Unit,
+    viewModel: PokemonListViewModel = viewModel()
 ) {
+    val pokemonList = viewModel.pokemonList
+
     LazyColumn {
-        items(pokemons) { pokemon ->
+        items(pokemonList) { pokemon ->
             Button(
                 onClick = {
                     onNavigateToDetail(pokemon.id)
@@ -101,9 +104,12 @@ fun PokemonListScreen(
 
 @Composable
 fun PokemonDetailScreen(
-    pokemonId: Int
+    pokemonId: Int,
+    viewModel: PokemonDetailViewModel = viewModel(),
 ) {
-    pokemons.find {it.id == pokemonId}?.let {
+    val pokemon = viewModel.getPokemonById(pokemonId)
+
+    pokemon?.let {
         Text(it.info)
     }
 }
