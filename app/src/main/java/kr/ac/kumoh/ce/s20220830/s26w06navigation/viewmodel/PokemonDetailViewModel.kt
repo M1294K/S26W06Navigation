@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kr.ac.kumoh.ce.s20220830.s26w06navigation.model.Pokemon
-import kr.ac.kumoh.ce.s20220830.s26w06navigation.pokemons
 import kr.ac.kumoh.ce.s20220830.s26w06navigation.repository.PokemonRepository
 
 class PokemonDetailViewModel(
