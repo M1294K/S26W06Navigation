@@ -1,9 +1,13 @@
 package kr.ac.kumoh.ce.s20220830.s26w06navigation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kr.ac.kumoh.ce.s20220830.s26w06navigation.model.Pokemon
+import kr.ac.kumoh.ce.s20220830.s26w06navigation.repository.PokemonRepository
+
 
 private val pokemons = listOf(
     Pokemon(1, "이상해씨", "풀/독", "태어날 때부터 등에 식물의 씨앗이 있어 조금씩 자란다."),
@@ -12,17 +16,16 @@ private val pokemons = listOf(
     Pokemon(25, "피카츄", "전기", "뺨에 전기 주머니가 있어서 위기에 처하면 전기를 방출한다.")
 )
 
-class PokemonListViewModel : ViewModel() {
-    private val _pokemonList = MutableStateFlow<List<Pokemon>>(pokemons)
-    val pokemonList = _pokemonList.asStateFlow()
-}
-
-class PokemonDetailViewModel(
-    private val pokemonId: Int
+class PokemonListViewModel(
+    private val repository: PokemonRepository
 ) : ViewModel() {
-    private val _pokemon = MutableStateFlow(
-        pokemons.find { it.id == pokemonId }
-            ?: Pokemon(-1, "알수 없음", "없음", "Unknown")
-    )
-    val pokemon = _pokemon.asStateFlow()
+
+    private val _pokemonList = MutableStateFlow<List<Pokemon>>(emptyList())
+    val pokemonList = _pokemonList.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            _pokemonList.value = repository.getAllPokemon()
+        }
+    }
 }
